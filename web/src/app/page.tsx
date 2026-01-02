@@ -13,10 +13,10 @@ export default function Home() {
             Complete management system for sports academies in Cyprus
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/auth/login">
+            <Link href="/login">
               <Button size="lg">Login</Button>
             </Link>
-            <Link href="/auth/register">
+            <Link href="/register">
               <Button size="lg" variant="outline">
                 Register
               </Button>
