@@ -29,7 +29,7 @@ export class AuthService {
         firstName: dto.firstName,
         lastName: dto.lastName,
         phone: dto.phone,
-        role: dto.role || 'STUDENT',
+        role: dto.role || ('STUDENT' as any),
         profile: {
           create: {},
         },
