@@ -1,74 +1,104 @@
-# Sports Academy Management System
+# Sports Academy Management Platform
 
-Complete, feature-rich sports academy management application tailored for Cyprus, built with modern technologies.
+A comprehensive sports academy management platform similar to [myTeam](https://my-team.co), built with a modern monorepo architecture.
 
-## 🚀 Features
+## 🏗️ Architecture
 
-### Core Features
-- **Multi-role Authentication**: Admin, Coach, Student, Parent roles with JWT and OAuth (Google, Facebook)
-- **User Profiles**: Complete profiles with photos, certifications, medical information
-- **Academy Management**: Multi-branch support, facility and equipment management
-- **Session Scheduling**: Recurring events, conflict detection, waitlist management
-- **Attendance Tracking**: QR code check-in, progress tracking, gamification
-- **Payment Processing**: Stripe integration (EUR), JCC support, invoicing, VAT compliance (19%)
-- **Real-time Communication**: In-app chat, WebSocket notifications
-- **Analytics Dashboard**: Comprehensive reports and data exports
-- **Mobile Support**: Offline capabilities, camera, GPS integration
+This is a **monorepo** containing three main applications:
 
-### Cyprus-Specific Features
-- **Currency**: Euro (EUR) with 19% VAT
-- **Languages**: English and Greek (Ελληνικά)
-- **Sports**: Football, Basketball, Swimming, Athletics, Water Sports
-- **Compliance**: GDPR, Cyprus Sports Organization (KOA) standards
-- **Integrations**: Cyprus holidays, local weather APIs
+- **`apps/api`**: NestJS backend (REST + WebSockets)
+- **`apps/web`**: Next.js 14 web application (admin/coach portal)
+- **`apps/mobile`**: Flutter mobile app (iOS/Android for coaches, parents, athletes)
 
-## 🏗️ Technology Stack
+### Shared Packages
 
-### Backend
-- **Framework**: NestJS with Node.js
-- **Database**: PostgreSQL with Prisma ORM
-- **Cache**: Redis
-- **Queue**: Bull/BullMQ
-- **Authentication**: Passport.js with JWT
-- **Payments**: Stripe, JCC Gateway
-- **Storage**: S3-compatible (MinIO)
-- **Real-time**: Socket.io
+- **`packages/prisma`**: Database schema and Prisma client
+- **`packages/types`**: Shared TypeScript types
 
-### Web Frontend
-- **Framework**: Next.js 14 (App Router)
-- **State Management**: Redux Toolkit
-- **Styling**: TailwindCSS
-- **UI Components**: Custom components with shadcn/ui patterns
-- **Data Fetching**: TanStack Query
-- **Forms**: React Hook Form with Zod validation
+## 🚀 Tech Stack
 
-### Mobile App
-- **Framework**: Flutter
-- **State Management**: Provider
-- **Authentication**: Firebase Auth
-- **Notifications**: Firebase Cloud Messaging
-- **Offline**: SQLite with drift
+### Backend (`apps/api`)
+- **NestJS** with TypeScript
+- **Prisma** ORM with PostgreSQL
+- **Redis** for caching and queues
+- **JWT** authentication with refresh tokens
+- **Role-based access control** (SUPER_ADMIN, CLUB_ADMIN, SECRETARY, COACH, PARENT, ATHLETE)
+- **Firebase Cloud Messaging** for push notifications
+- **Email** via SendGrid/Resend
 
-## 📋 Prerequisites
+### Web App (`apps/web`)
+- **Next.js 14** with App Router
+- **TypeScript**
+- **Tailwind CSS** + **shadcn/ui** components
+- **NextAuth** for authentication
 
-- Node.js >= 18.0.0
-- PostgreSQL >= 15
-- Redis >= 7
-- Docker & Docker Compose (for containerized deployment)
-- Flutter SDK >= 3.16 (for mobile development)
+### Mobile App (`apps/mobile`)
+- **Flutter** for iOS and Android
+- **Provider** for state management
+- **Firebase** for push notifications
+- Multi-language support (Greek/English)
 
-## 🛠️ Installation
+### Database
+- **PostgreSQL 15** (multi-tenant by club_id)
+- **Redis 7** for caching
 
-### 1. Clone the Repository
+## 📦 Features
+
+### Core Modules
+
+1. **Club & User Management**
+   - Clubs, facilities, teams, age groups
+   - Users with roles and permissions
+   - Multi-tenant architecture
+
+2. **Calendars & Attendance**
+   - Training and match events
+   - Real-time attendance tracking
+   - Push notifications for changes
+
+3. **Financial Management**
+   - Subscription plans and recurring billing
+   - Invoice generation and payment tracking
+   - Overdue payment reminders
+   - Expense tracking
+
+4. **Inventory Management**
+   - Products (kits, equipment)
+   - Stock tracking and movements
+
+5. **Sponsors**
+   - Sponsor management
+   - Member offers and discounts
+
+6. **Communication**
+   - Team and club announcements
+   - Push notifications and email broadcasts
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- **Node.js** >= 20.0.0
+- **npm** >= 10.0.0
+- **Docker** and **Docker Compose** (for local development)
+- **Flutter** >= 3.0.0 (for mobile development)
+
+### Local Development
+
+1. **Clone the repository**
 
 ```bash
-git clone https://github.com/savvaszi/sportsacademy.git
-cd sportsacademy
+git clone <repository-url>
+cd Sportsacademy
 ```
 
-### 2. Environment Setup
+2. **Install dependencies**
 
-Copy the example environment file and configure:
+```bash
+npm install
+```
+
+3. **Set up environment variables**
 
 ```bash
 cp .env.example .env
@@ -78,251 +108,332 @@ Edit `.env` with your configuration:
 
 ```env
 # Database
-DATABASE_URL="postgresql://postgres:password@localhost:5432/sportsacademy"
+DATABASE_URL="postgresql://sportsacademy:changeme@localhost:5432/sportsacademy?schema=public"
+
+# Redis
+REDIS_URL="redis://localhost:6379"
 
 # JWT
 JWT_SECRET="your-super-secret-jwt-key"
+JWT_REFRESH_SECRET="your-super-secret-refresh-key"
 
-# Stripe
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
+# API
+API_PORT=3001
+NEXT_PUBLIC_API_URL="http://localhost:3001"
 
 # Email
 SMTP_HOST="smtp.sendgrid.net"
+SMTP_PORT=587
 SMTP_USER="apikey"
-SMTP_PASSWORD="your-api-key"
-EMAIL_FROM="noreply@sportsacademy.cy"
+SMTP_PASSWORD="your-sendgrid-api-key"
+SMTP_FROM="noreply@yourdomain.com"
 
-# APIs
-OPENWEATHER_API_KEY="..."
-GOOGLE_MAPS_API_KEY="..."
+# Firebase
+FCM_SERVER_KEY="your-fcm-server-key"
+FCM_PROJECT_ID="your-firebase-project-id"
 ```
 
-### 3. Install Dependencies
+4. **Start services with Docker Compose**
 
 ```bash
-# Install root dependencies
-npm install
-
-# Install workspace dependencies
-npm install --workspaces
+docker compose up -d postgres redis
 ```
 
-### 4. Database Setup
+5. **Generate Prisma client and run migrations**
 
 ```bash
-# Generate Prisma Client
-npm run prisma:generate
-
-# Run migrations
-npm run prisma:migrate
-
-# Seed database (optional)
-npm run prisma:seed
+npm run db:generate
+npm run db:migrate
 ```
 
-### 5. Start Development Servers
+6. **Seed the database** (optional, creates demo data)
 
 ```bash
-# Start all services
+npm run db:seed
+```
+
+This creates:
+- Demo club: "Demo Sports Academy"
+- Admin user: `admin@demoacademy.com` / `password123`
+- Coach user: `coach@demoacademy.com` / `password123`
+- Parent user: `parent@demoacademy.com` / `password123`
+- Athlete user: `athlete@demoacademy.com` / `password123`
+
+7. **Start development servers**
+
+```bash
+# Start all apps
 npm run dev
 
 # Or start individually
-npm run dev:backend  # Backend on http://localhost:3001
-npm run dev:web      # Web on http://localhost:3000
+cd apps/api && npm run dev
+cd apps/web && npm run dev
+```
+
+8. **Access the applications**
+
+- **API**: http://localhost:3001/api
+- **Web App**: http://localhost:3000
+- **API Documentation**: http://localhost:3001/api/docs (if Swagger is configured)
+
+### Mobile Development
+
+1. **Navigate to mobile app**
+
+```bash
+cd apps/mobile
+```
+
+2. **Get Flutter dependencies**
+
+```bash
+flutter pub get
+```
+
+3. **Run on emulator/device**
+
+```bash
+# iOS
+flutter run -d ios
+
+# Android
+flutter run -d android
 ```
 
 ## 🐳 Docker Deployment
 
-### Local Development with Docker
+### Build Docker Images
 
 ```bash
-docker-compose up -d
+# Build API
+docker build -f apps/api/Dockerfile -t sportsacademy-api .
+
+# Build Web
+docker build -f apps/web/Dockerfile -t sportsacademy-web .
 ```
 
-### Production Deployment
+### Run with Docker Compose
 
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker compose up -d
 ```
 
-## 🚢 Dokploy Deployment
+This starts:
+- PostgreSQL on port 5432
+- Redis on port 6379
+- API on port 3001
+- Web on port 3000
 
-### Prerequisites
-- Dokploy instance running
-- Domain configured with SSL
-- Environment variables configured in Dokploy
+### Dokploy Deployment
 
-### Deployment Steps
+#### Required Environment Variables
 
-1. **Create PostgreSQL Database**
-   - In Dokploy, create a PostgreSQL service
-   - Note the connection string
+Set these in your Dokploy project:
+
+```env
+# Database (use Dokploy Postgres service)
+DATABASE_URL=postgresql://user:password@postgres:5432/sportsacademy?schema=public
+
+# Redis (use Dokploy Redis service)
+REDIS_URL=redis://redis:6379
+
+# JWT Secrets (generate secure random strings)
+JWT_SECRET=<generate-secure-random-string>
+JWT_REFRESH_SECRET=<generate-secure-random-string>
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# API Configuration
+API_PORT=3001
+NODE_ENV=production
+
+# Web Configuration
+NEXT_PUBLIC_API_URL=https://api.yourdomain.com
+NEXTAUTH_SECRET=<generate-secure-random-string>
+NEXTAUTH_URL=https://yourdomain.com
+
+# Email (SendGrid/Resend)
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASSWORD=<your-sendgrid-api-key>
+SMTP_FROM=noreply@yourdomain.com
+
+# Firebase Cloud Messaging
+FCM_SERVER_KEY=<your-fcm-server-key>
+FCM_PROJECT_ID=<your-firebase-project-id>
+
+# Payment Providers (optional)
+JCC_MERCHANT_ID=
+JCC_API_KEY=
+VIVA_MERCHANT_ID=
+VIVA_API_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
+```
+
+#### Dokploy Services Configuration
+
+1. **Create Postgres Service**
+   - Service: PostgreSQL 15
+   - Database: `sportsacademy`
+   - Note the connection details for DATABASE_URL
 
 2. **Create Redis Service**
-   - Create a Redis service in Dokploy
-   - Note the connection details
+   - Service: Redis 7
+   - Note the connection URL for REDIS_URL
 
-3. **Deploy Backend**
-   ```bash
-   # Push to GitHub
-   git push origin main
-   
-   # In Dokploy:
-   # - Create new application
-   # - Connect to GitHub repository
-   # - Set build path: ./backend
-   # - Configure environment variables
-   # - Deploy
-   ```
+3. **Deploy API Service**
+   - Type: Docker
+   - Dockerfile: `apps/api/Dockerfile`
+   - Port: 3001
+   - Health check: `/api/health`
+   - Startup command: Runs migrations automatically
 
-4. **Deploy Web Frontend**
-   ```bash
-   # In Dokploy:
-   # - Create new application
-   # - Connect to GitHub repository
-   # - Set build path: ./web
-   # - Configure environment variables
-   # - Deploy
-   ```
+4. **Deploy Web Service**
+   - Type: Docker
+   - Dockerfile: `apps/web/Dockerfile`
+   - Port: 3000
+   - Depends on: API service
 
-5. **Configure Domains**
-   - Backend: `api.sportsacademy.cy`
-   - Frontend: `sportsacademy.cy`
+#### Post-Deployment
 
-## 📱 Mobile App Development
-
-### Setup Flutter Environment
+1. **Run database migrations** (if not auto-run):
 
 ```bash
-cd mobile
-flutter pub get
+docker exec -it <api-container> sh -c "cd /app/packages/prisma && npx prisma migrate deploy"
 ```
 
-### Run on iOS
+2. **Seed database** (optional):
 
 ```bash
-flutter run -d ios
+docker exec -it <api-container> sh -c "cd /app/packages/prisma && npx prisma db seed"
 ```
 
-### Run on Android
+## 📚 API Endpoints
 
-```bash
-flutter run -d android
-```
+### Authentication
+- `POST /api/auth/login` - Login with email/password
+- `POST /api/auth/refresh` - Refresh access token
 
-### Build for Production
+### Users
+- `GET /api/users` - List users (admin only)
+- `GET /api/users/:id` - Get user details
+- `POST /api/users` - Create user (admin only)
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user (admin only)
 
-```bash
-# iOS
-flutter build ipa
+### Teams
+- `GET /api/teams` - List teams
+- `GET /api/teams/:id` - Get team details
+- `POST /api/teams` - Create team
+- `PUT /api/teams/:id` - Update team
+- `DELETE /api/teams/:id` - Delete team
 
-# Android
-flutter build apk --release
-```
+### Events
+- `GET /api/events?teamId=:id` - List events for team
+- `GET /api/events/:id` - Get event details
+- `POST /api/events` - Create event
+- `PUT /api/events/:id` - Update event
+- `DELETE /api/events/:id` - Delete event
 
-## 📚 API Documentation
+### Attendance
+- `POST /api/attendance/events/:eventId/bulk` - Mark bulk attendance
+- `GET /api/attendance/events/:eventId` - Get event attendance
+- `GET /api/attendance/athletes/:athleteId` - Get athlete attendance history
 
-Once the backend is running, access the Swagger documentation:
-
-```
-http://localhost:3001/api/docs
-```
+### Subscriptions & Payments
+- `GET /api/subscriptions/plans` - List subscription plans
+- `POST /api/subscriptions` - Create subscription
+- `POST /api/payments/invoices` - Create invoice
+- `POST /api/payments/invoices/:id/payments` - Record payment
+- `GET /api/payments/overdue` - List overdue invoices
 
 ## 🧪 Testing
 
-### Backend Tests
-
 ```bash
-cd backend
-npm run test          # Unit tests
-npm run test:e2e      # E2E tests
-npm run test:cov      # Coverage
-```
-
-### Web Tests
-
-```bash
-cd web
+# Run all tests
 npm run test
+
+# Run API tests
+cd apps/api && npm run test
+
+# Run with coverage
+npm run test:cov
 ```
 
-### Mobile Tests
+## 📝 Database Schema
 
-```bash
-cd mobile
-flutter test
-```
-
-## 📊 Database Schema
-
-The application uses a comprehensive PostgreSQL schema with the following main entities:
-
-- **Users**: Multi-role user system
-- **Academies & Branches**: Multi-location support
-- **Programs**: Sports programs and courses
-- **Sessions**: Scheduled training sessions
-- **Attendance**: Check-in/out tracking
-- **Payments & Invoices**: Financial transactions
-- **Bookings**: Facility reservations
-- **Messages & Notifications**: Communication system
-
-View the complete schema: `backend/prisma/schema.prisma`
+Key entities:
+- **Club**: Multi-tenant root entity
+- **User**: With role-based permissions
+- **Team**: Belongs to club and age group
+- **AthleteProfile**: Linked to user
+- **Event**: Training/match events
+- **Attendance**: Event attendance tracking
+- **Subscription**: Recurring billing
+- **Invoice**: Payment tracking
+- **Payment**: Payment records
+- **Sponsor**: Sponsor management
+- **Announcement**: Communication
 
 ## 🔐 Security
 
-- JWT-based authentication
+- JWT-based authentication with refresh tokens
 - Role-based access control (RBAC)
+- Multi-tenancy by `club_id`
 - Password hashing with bcrypt
-- Rate limiting
 - CORS configuration
-- Helmet security headers
-- Input validation
-- SQL injection prevention (Prisma)
-- XSS protection
-- GDPR compliance features
+- Input validation with class-validator
 
 ## 🌍 Internationalization
 
-The application supports:
+The mobile app supports:
 - English (en)
-- Greek (el - Ελληνικά)
+- Greek (el)
 
-Add new languages in:
-- Backend: `backend/src/i18n/`
-- Web: `web/src/locales/`
-- Mobile: `mobile/lib/l10n/`
+## 📱 Mobile App Features
 
-## 📈 Monitoring & Logging
+### For Coaches
+- View today's sessions
+- Mark attendance
+- Add player notes
+- View team roster
 
-- **Error Tracking**: Sentry integration
-- **Logging**: Winston (backend)
-- **Metrics**: Prometheus-compatible
-- **Health Checks**: `/health` endpoint
+### For Parents/Athletes
+- View schedule
+- Check fees status
+- Read announcements
+- Receive push notifications
+- View profile
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-## 📝 License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is proprietary and confidential.
 
-## 👥 Support
+## 🆘 Support
 
-For support, email support@sportsacademy.cy or join our Slack channel.
+For support, email support@yourdomain.com or open an issue in the repository.
 
-## 🙏 Acknowledgments
+## 🗺️ Roadmap
 
-- Built for Cyprus sports academies
-- Compliant with Cyprus and EU regulations
-- Supports local payment methods (JCC)
-- Integrated with Cyprus-specific services
+- [ ] Tournament management
+- [ ] Social media integration
+- [ ] Advanced analytics and reporting
+- [ ] Video analysis tools
+- [ ] Parent portal enhancements
+- [ ] Mobile app offline mode
+- [ ] WhatsApp integration
+- [ ] Advanced payment provider integrations (JCC, Viva, Stripe)
 
 ---
 
-**Made with ❤️ in Cyprus** 🇨🇾
+**Built with ❤️ for sports academies**

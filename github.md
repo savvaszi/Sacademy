@@ -1,0 +1,2 @@
+repository: https://github.com/savvaszi/Sacademy
+key: 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

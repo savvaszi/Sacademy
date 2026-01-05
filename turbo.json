@@ -10,14 +10,10 @@
       "cache": false,
       "persistent": true
     },
-    "test": {
-      "dependsOn": ["build"],
-      "outputs": ["coverage/**"]
-    },
     "lint": {
-      "outputs": []
+      "dependsOn": ["^lint"]
     },
-    "prisma:generate": {
+    "clean": {
       "cache": false
     }
   }
