@@ -20,6 +20,21 @@ async function main() {
 
   console.log('✅ Created club:', club.name);
 
+  // Create superadmin user
+  const superadmin = await prisma.user.create({
+    data: {
+      clubId: club.id,
+      email: 'superadmin@sportsacademy.com',
+      passwordHash,
+      firstName: 'Super',
+      lastName: 'Admin',
+      role: UserRole.SUPER_ADMIN,
+      phone: '+357 99 000000',
+    },
+  });
+
+  console.log('✅ Created superadmin user:', superadmin.email);
+
   const facility = await prisma.facility.create({
     data: {
       clubId: club.id,
@@ -224,6 +239,7 @@ async function main() {
 
   console.log('\n🎉 Seeding completed successfully!');
   console.log('\n📝 Demo credentials:');
+  console.log('   Superadmin: superadmin@sportsacademy.com / password123');
   console.log('   Admin: admin@demoacademy.com / password123');
   console.log('   Coach: coach@demoacademy.com / password123');
   console.log('   Parent: parent@demoacademy.com / password123');
