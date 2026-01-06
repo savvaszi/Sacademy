@@ -20,7 +20,7 @@ export class PaymentsService {
     });
   }
 
-  async recordPayment(invoiceId: string, amount: number, method: string, transactionId?: string) {
+  async recordPayment(invoiceId: string, amount: number, method: any, transactionId?: string) {
     const invoice = await this.prisma.invoice.findUnique({
       where: { id: invoiceId },
       include: {
