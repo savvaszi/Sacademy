@@ -60,11 +60,9 @@ RUN npx prisma generate
 COPY apps/api/init.sh /app/init.sh
 RUN chmod +x /app/init.sh
 
-# Set working directory to API
-WORKDIR /app/apps/api
-
 # Expose port
 EXPOSE 3000
 
-# Start application with initialization
-CMD ["/bin/sh", "-c", "/app/init.sh && node dist/main.js"]
+# Start application with initialization (from root to access both init script and API)
+WORKDIR /app
+CMD ["/bin/sh", "-c", "/app/init.sh && node /app/apps/api/dist/main.js"]
