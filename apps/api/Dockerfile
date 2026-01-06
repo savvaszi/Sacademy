@@ -50,8 +50,7 @@ RUN npm ci --omit=dev || npm install --production
 # Copy built application and packages
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/packages/prisma ./packages/prisma
-COPY --from=builder /app/packages/types/dist ./packages/types/dist
-COPY --from=builder /app/packages/types/package.json ./packages/types/
+COPY --from=builder /app/packages/types ./packages/types
 
 # Generate Prisma client in production
 WORKDIR /app/packages/prisma
