@@ -7,6 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY turbo.json ./
 COPY tsconfig.json ./
+COPY packages/prisma/package.json ./packages/prisma/
 COPY packages/types/package.json ./packages/types/
 COPY apps/web/package.json ./apps/web/
 
@@ -14,6 +15,7 @@ COPY apps/web/package.json ./apps/web/
 RUN npm install
 
 # Copy source code
+COPY packages/prisma ./packages/prisma
 COPY packages/types ./packages/types
 COPY apps/web ./apps/web
 

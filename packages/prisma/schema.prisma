@@ -145,7 +145,7 @@ model User {
   club              Club               @relation(fields: [clubId], references: [id], onDelete: Cascade)
   athleteProfile    AthleteProfile?
   parentLinks       ParentLink[]
-  coachAssignments  CoachAssignment[]
+  coachAssignments  CoachAssignment[] @relation("CoachAssignments")
   deviceTokens      DeviceToken[]
   createdAnnouncements Announcement[]
 
@@ -193,8 +193,8 @@ model CoachAssignment {
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  coach Coach @relation(fields: [coachId], references: [id], onDelete: Cascade)
-  team  Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  coach User @relation("CoachAssignments", fields: [coachId], references: [id], onDelete: Cascade)
+  team  Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([coachId, teamId])
   @@map("coach_assignments")
