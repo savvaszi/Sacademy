@@ -56,11 +56,15 @@ COPY --from=builder /app/packages/types ./packages/types
 WORKDIR /app/packages/prisma
 RUN npx prisma generate
 
+# Copy initialization script
+COPY apps/api/init.sh /app/init.sh
+RUN chmod +x /app/init.sh
+
 # Set working directory to API
 WORKDIR /app/apps/api
 
 # Expose port
 EXPOSE 3000
 
-# Start application
-CMD ["node", "dist/main.js"]
+# Start application with initialization
+CMD ["/bin/sh", "-c", "/app/init.sh && node dist/main.js"]
