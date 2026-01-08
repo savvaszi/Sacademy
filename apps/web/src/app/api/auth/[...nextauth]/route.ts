@@ -1,7 +1,8 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { appwriteAuth } from '@/lib/appwrite-auth';
 
-const handler = NextAuth({
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -15,32 +16,21 @@ const handler = NextAuth({
         }
 
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-          const response = await fetch(`${apiUrl}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
+          const result = await appwriteAuth.login({
+            email: credentials.email,
+            password: credentials.password,
           });
 
-          if (!response.ok) {
-            return null;
-          }
-
-          const data = await response.json();
-          
-          if (data.access_token) {
-            return {
-              id: data.user.id,
-              email: data.user.email,
-              name: `${data.user.firstName} ${data.user.lastName}`,
-              role: data.user.role,
-              accessToken: data.access_token,
-            };
+          if (result.success && result.session) {
+            const userResult = await appwriteAuth.getCurrentUser();
+            
+            if (userResult.success && userResult.user) {
+              return {
+                id: userResult.user.$id,
+                email: userResult.user.email,
+                name: userResult.user.name,
+              };
+            }
           }
 
           return null;
@@ -54,15 +44,17 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken;
-        token.role = user.role;
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.accessToken = token.accessToken;
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
     }
@@ -74,6 +66,8 @@ const handler = NextAuth({
     strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
