@@ -47,3 +47,4 @@ app.*.map.json
 /web/flutter_service_worker.js
 /web/manifest.json
 /web/version.json
+pubspec.lock
