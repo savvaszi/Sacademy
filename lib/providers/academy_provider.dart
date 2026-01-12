@@ -197,6 +197,22 @@ class AcademyProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> deleteStudent(String studentId) async {
+    try {
+      await AppwriteService.instance.databases.deleteDocument(
+        databaseId: AppwriteService.instance.databaseId,
+        collectionId: AppwriteService.studentsCollection,
+        documentId: studentId,
+      );
+      
+      _students.removeWhere((s) => s.id == studentId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting student: $e');
+      rethrow;
+    }
+  }
+
   Future<void> addClass(SportsClass sportsClass) async {
     try {
       final doc = await AppwriteService.instance.databases.createDocument(
